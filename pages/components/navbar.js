@@ -6,6 +6,28 @@ import { Auth, Hub } from 'aws-amplify'
 
 const Navbar = () => {
     const [signedUser, setSignedUser] = useState(false);
+    useEffect(() => {
+        authListener()
+    }, [])
+
+    async function authListener(){
+        Hub.listen("auth", (data) => {
+            switch (data.payload.event){
+                case"Sign in":
+                    return setSignedUser(true)
+                case"Sign Out":
+                    return setSignedUser(false)
+                
+            }
+        })
+        try {
+            await Auth.currentAuthenticatedUser()
+            setSignedUser(true)
+            
+        } catch (error) {
+            
+        }
+    }
 
     return (
         <nav className='flex justify-center pt-3 pb-3 
@@ -17,9 +39,18 @@ const Navbar = () => {
                     ["Profile", "/profile"]
                 ].map(([title,url], index) => (
                     <Link href={url} key={index}>
-                        <a className='rounded-lg-px3 py-2 text-slate-700 font-medium hover:bg-slate-900'>{title}</a>
+                        <a className='rounded-lg-px3 py-2 text-slate-700 font-medium hover:bg-slage-100 hover:text-slate-900'>{title}</a>
                     </Link>
                 ))
+            }
+
+            {
+                signedUser && (
+                    <Link href="/my-posts">
+                        <a className='rounded-lg-px3 py-2 text-slate-700 font-medium hover:bg-slage-100 hover:text-slate-900'>My Post</a>
+
+                    </Link>
+                )
             }
             
         </nav>
